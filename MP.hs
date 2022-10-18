@@ -22,13 +22,13 @@ lookUp s dictionary
 isNotSeparator :: Char -> [Char] -> Bool
 isNotSeparator s separators
   | s `elem` separators = False
-  | otherwise = True
+  | otherwise           = True
 
 splitText :: [Char] -> String -> (String, [String])
 splitText _ "" = ("", [""])
 splitText someSeparators t@(c:cs)
   | isNotSeparator c someSeparators = (m, ([c] ++ theHead) : theTail)
-  | otherwise = (c : m, "" : t')
+  | otherwise                       = (c : m, "" : t')
   where
     (m, t') = splitText someSeparators cs
     theHead = head t'
@@ -36,13 +36,17 @@ splitText someSeparators t@(c:cs)
 
 combine :: String -> [String] -> [String]
 combine "" something = something
-combine (a:as) (b:bs) = b : head [[a]:b']
+combine (a:as) (b:bs) = b : head [[a]:b'] -- strips separator off original list
   where
     b' = combine as bs
 
 getKeywordDefs :: [String] -> KeywordDefs
-getKeywordDefs
-  = undefined
+getKeywordDefs [] = []
+getKeywordDefs file@(f:fs)
+  = (kw, unwords kd) : kwds       -- unwords work like combine " " text
+  where                           -- but it returns String instead of [String]
+    (_, kw:kd) = splitText " \n" f 
+    kwds       = getKeywordDefs fs
 
 expand :: FileContents -> FileContents -> FileContents
 expand
