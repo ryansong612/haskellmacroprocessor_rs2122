@@ -13,11 +13,12 @@ separators :: String
 separators
   = " \n\t.,:;!\"\'()<>/\\"
 -----------------------------------------------------
+-- Looks up a corresponding value of inputted string in a dictionary
 lookUp :: String -> [(String, a)] -> [a]
 lookUp s dictionary
   = [q | (p, q) <- dictionary, p == s]
 
-
+-- Split text based on chosen separators and string
 splitText :: [Char] -> String -> (String, [String])
 splitText _ "" = ("", [""])
 splitText someSeparators t@(c:cs)
@@ -28,12 +29,14 @@ splitText someSeparators t@(c:cs)
     theHead = head t'
     theTail = tail t'
 
+-- The inverse function of splitText
 combine :: String -> [String] -> [String]
 combine "" something  = something
 combine (a:as) (b:bs) = b : head [[a]:b'] -- strips separator off original list
   where
     b' = combine as bs
 
+-- gets a pair of Keyword and its Definition based on an inputted string
 getKeywordDefs :: [String] -> KeywordDefs
 getKeywordDefs [] = []
 getKeywordDefs file@(f:fs)
@@ -42,6 +45,7 @@ getKeywordDefs file@(f:fs)
     (_, kw:kd) = splitText " \n" f
     kwds       = getKeywordDefs fs
 
+-- expands definition based on file contents
 expand :: FileContents -> FileContents -> FileContents
 expand "" _ = ""
 expand stuff definitions
