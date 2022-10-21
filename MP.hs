@@ -39,6 +39,7 @@ combine (a:as) (b:bs) = b : head [[a]:b'] -- strips separator off original list
 -- gets a pair of Keyword and its Definition based on an inputted string
 getKeywordDefs :: [String] -> KeywordDefs
 getKeywordDefs [] = []
+getKeywordDefs [""] = []
 getKeywordDefs (f:fs)
   = (kw, unwords kd) : kwds       -- unwords work like combine " " text
   where                           -- but it returns String instead of [String]
@@ -55,7 +56,6 @@ expand stuff definitions
     (m, n)            = splitText separators stuff
     q                 = combine m n
     defs              = getKeywordDefs definitions'
-
 
 -- this adds \n-----\n to the expanded file
 addSpace :: String -> [String] -> String
@@ -83,7 +83,6 @@ main :: IO ()
 main = do
   args <- getArgs
   main' args
-
   where
     main' :: [String] -> IO ()
     main' [template, source, output] = do
