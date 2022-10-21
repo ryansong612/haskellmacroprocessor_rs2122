@@ -33,6 +33,7 @@ splitTextTestCases
         ==> ("[]",["Guess What! This is ",""," a list!"])
     ]
 
+combineTestCases :: [((String, [String]), [String])]
 combineTestCases
   = [ (" ,   .", ["A","comma","","then","some","words",""])
         ==> ["A"," ","comma",",",""," ","then"," ","some"," ","words",".",""]
@@ -88,6 +89,13 @@ expandTestCases
         ==> "My name is Kevin Durant"
     ]
 
+
+
+multiExpandTestCases
+  = [ ("Welcome to $town, where $name was born in $birth-date."
+  , "$name William Shakespeare\n$birth-date 1564\n$town Stratford upon Avon\n#\n$birth-date 1840\n$town Stinsford\n$name Thomas Hardy\n#\n$name Charles Dickens\n$town Landport\n$birth-date 1812")
+    ==> "Welcome to Stratford upon Avon, where William Shakespeare was born in 1564.\n-----\nWelcome to Stinsford, where Thomas Hardy was born in 1840.\n-----\nWelcome to Landport, where Charles Dickens was born in 1812."
+  ]
 allTestCases
   = [ TestCase "lookUp"  (uncurry lookUp)
                          lookUpTestCases
@@ -101,6 +109,8 @@ allTestCases
 
     , TestCase "expand"  (uncurry expand)
                          expandTestCases
+    , TestCase "multiExpand" (uncurry multiExpand)
+                         multiExpandTestCases
     ]
 
 runTests = mapM_ goTest allTestCases

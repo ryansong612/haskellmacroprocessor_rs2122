@@ -11,7 +11,7 @@ type KeywordDefs  = [(Keyword, KeywordValue)]
 
 separators :: String
 separators
-  = " \n\t.,:;!\"\'()<>/\\"
+  = " \n\t.,:;!\"\'()<>/\\#"
 -----------------------------------------------------
 -- Looks up a corresponding value of inputted string in a dictionary
 lookUp :: String -> [(String, a)] -> [a]
@@ -49,14 +49,25 @@ getKeywordDefs file@(f:fs)
 expand :: FileContents -> FileContents -> FileContents
 expand "" _ = ""
 expand stuff definitions
-  = foldr1 (++) ([replaceWord p (getKeywordDefs definitions') | p <- q])
+ =  foldr1 (++) ([replaceWord p defs | p <- q])
   where
     (_, definitions') = splitText "\n" definitions
     (m, n)            = splitText separators stuff
     q                 = combine m n
+    defs = getKeywordDefs definitions'
 
--- You may wish to uncomment and implement this helper function
--- when implementing expand
+
+-- this adds \n-----\n to the expanded file
+addSpace :: String -> [String] -> String
+addSpace stuff [c] = c
+addSpace stuff (c:cs) = concat [c, stuff, addSpace stuff cs]
+
+-- extended function of expand
+multiExpand :: FileContents -> FileContents -> FileContents
+multiExpand cont defs = addSpace "\n-----\n" [expand cont i | i <- splitted]
+  where splitted = snd(splitText "#" defs)
+
+-- helper function, replaces placeholders with definitions
 replaceWord :: String -> KeywordDefs -> String
 replaceWord str [] = str
 replaceWord str (c : cs)
@@ -78,5 +89,5 @@ main = do
     main' [template, source, output] = do
       t <- readFile template
       i <- readFile source
-      writeFile output (expand t i)
+      writeFile output (multiExpand t i)
     main' _ = putStrLn ("Usage: runghc MP <template> <info> <output>")
