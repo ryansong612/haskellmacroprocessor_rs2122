@@ -22,8 +22,8 @@ lookUp s dictionary
 splitText :: [Char] -> String -> (String, [String])
 splitText _ "" = ("", [""])
 splitText someSeparators t@(c:cs)
-  | not (c `elem` someSeparators) = (m, ([c] ++ theHead) : theTail)
-  | otherwise                     = (c : m, "" : t')
+  | c `elem` someSeparators = (c : m, "" : t')
+  | otherwise               = (m, ([c] ++ theHead) : theTail)
   where
     (m, t') = splitText someSeparators cs
     theHead = head t'
@@ -39,7 +39,7 @@ combine (a:as) (b:bs) = b : head [[a]:b'] -- strips separator off original list
 -- gets a pair of Keyword and its Definition based on an inputted string
 getKeywordDefs :: [String] -> KeywordDefs
 getKeywordDefs [] = []
-getKeywordDefs file@(f:fs)
+getKeywordDefs (f:fs)
   = (kw, unwords kd) : kwds       -- unwords work like combine " " text
   where                           -- but it returns String instead of [String]
     (_, kw:kd) = splitText " \n" f
@@ -54,12 +54,12 @@ expand stuff definitions
     (_, definitions') = splitText "\n" definitions
     (m, n)            = splitText separators stuff
     q                 = combine m n
-    defs = getKeywordDefs definitions'
+    defs              = getKeywordDefs definitions'
 
 
 -- this adds \n-----\n to the expanded file
 addSpace :: String -> [String] -> String
-addSpace stuff [c] = c
+addSpace stuff [c]    = c
 addSpace stuff (c:cs) = concat [c, stuff, addSpace stuff cs]
 
 -- extended function of expand
